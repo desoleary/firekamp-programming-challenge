@@ -36,6 +36,10 @@ $ bin/rails db:migrate
 $ bin/rails s -p 3001
 ```
 
+#### Nice to haves
+- Cypress Testing
+- Better Controller Error Handling via `rescue_from Exception`
+
 
 
 

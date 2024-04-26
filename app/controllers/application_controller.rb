@@ -1,4 +1,10 @@
 class ApplicationController < ActionController::Base
+  if Rails.env.development? || Rails.env.test?
+    protect_from_forgery with: :null_session
+  else
+    protect_from_forgery with: :exception # helps protects against CSRF
+  end
+
   before_action :set_current_request_details
   before_action :authenticate
 
