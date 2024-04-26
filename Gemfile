@@ -50,6 +50,7 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
   gem 'rspec-rails', '~> 6.1', '>= 6.1.2'
+  gem 'dotenv-rails', '~> 3.1'
 end
 
 group :development do
@@ -63,3 +64,19 @@ group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
 end
+
+# Authentication Zero is commented out as we no longer need it after the gem has done its work
+# in generation the boilerplate code
+# gem 'authentication-zero'
+
+# The following gems were automatically added to our Gemfile when we ran our installation generator
+# via bin/rails g authentication --pwned --sudoable --omniauthable --two-factor
+
+# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
+gem "bcrypt", "~> 3.1.7"
+# Use OmniAuth to support multi-provider authentication [https://github.com/omniauth/omniauth]
+gem 'omniauth', '~> 2.1', '>= 2.1.2'
+# Provides a mitigation against CVE-2015-9284 [https://github.com/cookpad/omniauth-rails_csrf_protection]
+gem 'omniauth-rails_csrf_protection', '~> 1.0', '>= 1.0.1'
+
+gem 'omniauth-github', '~> 2.0', '>= 2.0.1'

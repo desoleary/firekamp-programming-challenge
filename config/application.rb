@@ -18,6 +18,8 @@ require "action_cable/engine"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+require 'dotenv/load' if Rails.env.development? || Rails.env.test?
+
 module Myapp
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
