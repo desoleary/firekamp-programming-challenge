@@ -39,6 +39,7 @@ $ bin/rails s -p 3001
 #### Nice to haves
 - Cypress Testing
 - Better Controller Error Handling via `rescue_from Exception`
+- Add ability to support multiple auth providers per user
 
 
 

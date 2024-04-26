@@ -1,3 +1,5 @@
+OmniAuth.config.logger = Rails.logger
+
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :github, ENV['FIREKAMP_GITHUB_CLIENT_ID'], ENV['FIREKAMP_GITHUB_CLIENT_SECRET'], scope: 'user:email'
 

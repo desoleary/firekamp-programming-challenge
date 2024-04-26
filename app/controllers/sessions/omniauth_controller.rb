@@ -6,11 +6,10 @@ module Sessions
     skip_before_action :authenticate
 
     def create
-      @user = User.where(omniauth_params).first_or_initialize(user_params)
+      @user = User.find_or_initialize_by_omniauth
 
       if @user.save
-        session = @user.sessions.create!
-        cookies.signed.permanent[:session_token] = { value: session.id, httponly: true }
+        cookie_manager.with_auth0_cookie(request.env["omniauth.auth"].except(:extra))
 
         redirect_to root_path, notice: 'Signed in successfully'
       else
@@ -23,14 +22,6 @@ module Sessions
     end
 
     private
-
-    def omniauth_params
-      { provider: omniauth.provider, uid: omniauth.uid }
-    end
-
-    def user_params
-      { email: omniauth.info.email, password: SecureRandom.base58, verified: true }
-    end
 
     def omniauth
       request.env['omniauth.auth']

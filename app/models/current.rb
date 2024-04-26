@@ -1,6 +1,7 @@
 class Current < ActiveSupport::CurrentAttributes
-  attribute :session
+  attribute :user
   attribute :user_agent, :ip_address
+  attribute :omniauth_hash
 
-  delegate :user, to: :session, allow_nil: true
+  delegate :email, to: :user, allow_nil: true
 end

@@ -1,7 +1,7 @@
 <p style="color: green"><%= notice %></p>
 
-<p>Signed as <%= Current.user.email %></p>
+<p>Signed in as <%= Current.email %></p>
 
 <h2>Login and verification</h2>
 
-<%= button_to "Log out", Current.session, method: :delete %>
+<%= button_to "Log out", sessions_path, method: :delete %>
