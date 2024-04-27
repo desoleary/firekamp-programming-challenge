@@ -1,7 +1,7 @@
 OmniAuth.config.logger = Rails.logger
 
 Rails.application.config.middleware.use OmniAuth::Builder do
-  provider :github, ENV['FIREKAMP_GITHUB_CLIENT_ID'], ENV['FIREKAMP_GITHUB_CLIENT_SECRET'], scope: 'user:email'
+  provider :github, ENV['FIREKAMP_GITHUB_CLIENT_ID'], ENV['FIREKAMP_GITHUB_CLIENT_SECRET'], scope: 'user:email,public_repo'
 
   # Handles authentication failures not captured outside of the controller
   on_failure do |env|

@@ -80,3 +80,7 @@ gem 'omniauth', '~> 2.1', '>= 2.1.2'
 gem 'omniauth-rails_csrf_protection', '~> 1.0', '>= 1.0.1'
 
 gem 'omniauth-github', '~> 2.0', '>= 2.0.1'
+gem 'faraday', '~> 2.9'
+gem 'faraday-http-cache', '~> 2.5', '>= 2.5.1'
+
+gem 'oj', '~> 3.16', '>= 3.16.3'
