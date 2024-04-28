@@ -51,3 +51,5 @@ $ bin/rails s -p 3001
 - Better Controller Error Handling via `rescue_from Exception`
 - Add ability to support multiple auth providers per user
 - Integrate with nextjs
+- Fix findDOMNode is deprecated issue
+- Remove hardcoded text and use i18n instead
