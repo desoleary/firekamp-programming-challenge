@@ -84,3 +84,7 @@ gem 'faraday', '~> 2.9'
 gem 'faraday-http-cache', '~> 2.5', '>= 2.5.1'
 
 gem 'oj', '~> 3.16', '>= 3.16.3'
+
+gem "shakapacker", "= 7.2"
+
+gem "react-rails", "= 3.2"

@@ -36,37 +36,18 @@ $ bin/rails db:migrate
 $ bin/rails s -p 3001
 ```
 
+#### React
+- Makes use of `react-rails` gem
+- Compilation and HMR is conducted with use of `shakapacker` gem
+
+###### HMR support
+`./bin/shakapacker-dev-server` # runs on port 3035
+
+###### Component Generator
+`bin/rails g react:component HelloWorld greeting:string`
+
 #### Nice to haves
 - Cypress Testing
 - Better Controller Error Handling via `rescue_from Exception`
 - Add ability to support multiple auth providers per user
-
-
-
-
-
-
-
-
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- Integrate with nextjs

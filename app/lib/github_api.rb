@@ -56,12 +56,24 @@ class GithubApi
       GetCurrentUserInfo: <<~GRAPHQL,
         query {
           viewer {
+            id
             login
-            name
             email
             avatarUrl
-            createdAt
-            updatedAt
+            projectsUrl
+            url
+            websiteUrl
+            repositories(first: 20, orderBy: {field: CREATED_AT, direction: DESC}) {
+              nodes {
+                id
+                name
+                description
+                homepageUrl
+                diskUsage
+                createdAt
+                updatedAt
+              }
+            }
           }
         }
       GRAPHQL
@@ -87,8 +99,9 @@ class GithubApi
         viewer {
           repositories(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) {
             nodes {
-              name
               id
+              name
+              description
               createdAt
               updatedAt
             }
