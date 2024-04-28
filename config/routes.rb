@@ -9,6 +9,10 @@ Rails.application.routes.draw do
   get  "/auth/:provider/callback", to: "sessions/omniauth#create"
   post "/auth/:provider/callback", to: "sessions/omniauth#create"
 
+  namespace :github do
+    post '/repositories/update', to: 'repositories#update'
+  end
+
   if Rails.env.development?
     mount GraphiQL::Rails::Engine, at: "/graphiql", graphql_path: "/graphql"
   end

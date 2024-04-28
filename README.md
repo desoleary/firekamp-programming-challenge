@@ -29,11 +29,13 @@ $ cd firekamp-programming-challenge
 $ bundle install
 $ bin/rails db:create
 $ bin/rails db:migrate
+$ yarn
 ```
 
-##### Running
+##### Running App
 ```bash
-$ bin/rails s -p 3001
+$ ./bin/shakapacker-dev-server # Adds support for HMR
+$ bin/rails s -p 3001 # Ensure you have your .env values filled
 ```
 
 #### React

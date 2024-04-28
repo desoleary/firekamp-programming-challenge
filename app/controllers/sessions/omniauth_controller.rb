@@ -6,14 +6,16 @@ module Sessions
     skip_before_action :authenticate
 
     def create
+      cookie_manager.with_auth0_cookie(request.env["omniauth.auth"].except(:extra))
+      Current.omniauth_hash = cookie_manager.auth0_cookie
+
       @user = User.find_or_initialize_by_omniauth
 
       if @user.save
-        cookie_manager.with_auth0_cookie(request.env["omniauth.auth"].except(:extra))
 
         redirect_to root_path, notice: 'Signed in successfully'
       else
-        redirect_to sign_in_path, alert: 'Authentication failed'
+        redirect_to sign_in_path, alert: "Authentication failed with error '#{@user.errors.full_messages.first}'"
       end
     end
 

@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Authenticable
+  include GithubAccessible
 
   if Rails.env.development? || Rails.env.test?
     protect_from_forgery with: :null_session
@@ -12,6 +13,7 @@ class ApplicationController < ActionController::Base
 
 
   private
+
   def authenticate
     redirect_to sign_in_path unless authenticated? && Current.user
   end

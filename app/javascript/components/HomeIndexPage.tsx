@@ -23,6 +23,9 @@ interface UserInfoType {
     }
 }
 
+const csrfTokenElement = document.head.querySelector("[name='csrf-token']") as HTMLMetaElement;
+const csrfToken = csrfTokenElement ? csrfTokenElement.content : '';
+
 const getUserInfoItems = ({login, email, url}: Omit<UserInfoType, 'repositories'>) => {
     return [
         {
@@ -123,11 +126,26 @@ const RepositoriesTable = ({data}: { data: RepositoryType[] }) => {
             });
     };
 
+    const IncludeExcludeHiddenId: React.FC<{ record: RepositoryType, includeHiddenIdField: boolean }> = ({
+                                                                                                             record,
+                                                                                                             includeHiddenIdField
+                                                                                                         }) => {
+        if (!includeHiddenIdField) {
+            return null; // If includeHiddenIdField is false, don't render anything
+        }
+
+        return (
+            <Form.Item name="id" style={{display: 'none'}} initialValue={record.id}>
+                <Input type="hidden"/>
+            </Form.Item>
+        );
+    };
     const withExpandedRowRender = ({
-                                       editableFields = [], excludedFields = []
+                                       editableFields = [], excludedFields = [], includeHiddenIdField = false
                                    }: {
         editableFields: string[],
-        excludedFields: string[]
+        excludedFields: string[],
+        includeHiddenIdField: boolean
     }) => (record: RepositoryType) => {
         const fields = Object.keys(record)
             .filter(field => !excludedFields.includes(field));
@@ -137,6 +155,7 @@ const RepositoriesTable = ({data}: { data: RepositoryType[] }) => {
 
         return (
             <Form form={form} onFinish={handleSave} {...formLayout}>
+                <IncludeExcludeHiddenId record={record} includeHiddenIdField={includeHiddenIdField}/>
                 <Row gutter={24}>
                     <Col span={12}>{generateFormItems(record, leftFields, editableFields)}</Col>
                     <Col span={12}>{generateFormItems(record, rightFields, editableFields)}</Col>
@@ -150,19 +169,57 @@ const RepositoriesTable = ({data}: { data: RepositoryType[] }) => {
         );
     }
 
+    // const handleSave = () => {
+    //     form
+    //         .validateFields()
+    //         .then((values) => {
+    //             // Handle form submission, e.g., update repository data
+    //             console.log('Form values:', values);
+    //         })
+    //         .catch((error) => {
+    //             console.error('Validation failed:', error);
+    //         });
+    // };
+
     const handleSave = () => {
         form
             .validateFields()
             .then((values) => {
                 // Handle form submission, e.g., update repository data
                 console.log('Form values:', values);
+
+                // Send the form data to the server
+                fetch('/github/repositories/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': csrfToken,
+                    },
+                    body: JSON.stringify({repository: values}),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to update repository');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Repository updated successfully:', data);
+                    })
+                    .catch(error => {
+                        console.error('Failed to update repository:', error);
+                    });
             })
             .catch((error) => {
                 console.error('Validation failed:', error);
             });
     };
 
-    const expandedRowRender = withExpandedRowRender({editableFields: ['description'], excludedFields: ['id', 'key']})
+    const expandedRowRender = withExpandedRowRender({
+        editableFields: ['description'],
+        excludedFields: ['id', 'key'],
+        includeHiddenIdField: true
+    })
 
 
     return <Table

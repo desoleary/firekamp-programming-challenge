@@ -24,8 +24,9 @@ class GithubApi
     response_body.dig(:data, :repository)
   end
 
-  def update_repository_description(repository_id, description:)
-    response_body = execute_mutation(:UpdateRepository, { repositoryId: repository_id, description: description })
+  def update_repository_description(id:, description:)
+    response_body = execute_mutation(:UpdateRepository, { repositoryId: id, description: description })
+    Rails.logger.info('response_body: ' + response_body.to_json)
     response_body.dig(:data, :updateRepository, :repository)
   end
 
