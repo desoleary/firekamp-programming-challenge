@@ -111,8 +111,6 @@ GEM
       activesupport (>= 6.1)
     graphiql-rails (1.10.0)
       railties
-    graphql (2.3.1)
-      base64
     hashie (3.6.0)
     i18n (1.14.4)
       concurrent-ruby (~> 1.0)
@@ -313,7 +311,6 @@ DEPENDENCIES
   faraday (~> 2.9)
   faraday-http-cache (~> 2.5, >= 2.5.1)
   graphiql-rails (~> 1.10)
-  graphql (~> 2.3, >= 2.3.1)
   importmap-rails
   jbuilder
   oj (~> 3.16, >= 3.16.3)
