@@ -11,6 +11,6 @@ class SessionsController < ApplicationController
 
     reset_session
 
-    redirect_to(sign_in_path, notice: "That session has been logged out")
+    redirect_to(root_path, notice: "That session has been logged out")
   end
 end

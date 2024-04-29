@@ -1,5 +1,6 @@
 import React, {ReactNode, useState} from "react"
-import {Button, Col, Descriptions, Form, Input, Layout, Row, Table, TableProps, Typography} from 'antd';
+import {Button, Col, Descriptions, Divider, Form, Input, Layout, Row, Table, TableProps, Typography} from 'antd';
+import AppLayout from "./AppLayout";
 
 const {Title} = Typography
 
@@ -169,18 +170,6 @@ const RepositoriesTable = ({data}: { data: RepositoryType[] }) => {
         );
     }
 
-    // const handleSave = () => {
-    //     form
-    //         .validateFields()
-    //         .then((values) => {
-    //             // Handle form submission, e.g., update repository data
-    //             console.log('Form values:', values);
-    //         })
-    //         .catch((error) => {
-    //             console.error('Validation failed:', error);
-    //         });
-    // };
-
     const handleSave = () => {
         form
             .validateFields()
@@ -228,21 +217,24 @@ const RepositoriesTable = ({data}: { data: RepositoryType[] }) => {
         expandable={{expandedRowRender, expandedRowKeys, onExpand: handleExpand, expandRowByClick: true}}
     />
 }
+
+const SectionTitle = ({children}: { children?: ReactNode }) => <div style={{marginTop: 12}}><Divider/><TitlePanel>{children}</TitlePanel><Divider/></div>
+
 const HomeIndexPage = (data: UserInfoType) => {
     const {repositories, ...userInfo} = data
     const userInfoItems = getUserInfoItems(userInfo)
 
     return (
-        <Layout>
-            <TitlePanel>User Info</TitlePanel>
+        <AppLayout>
+            <SectionTitle>User Info</SectionTitle>
             <ContentLayout>
                 <Descriptions column={1} items={userInfoItems}/>
             </ContentLayout>
-            <TitlePanel>Repositories</TitlePanel>
+            <SectionTitle>Repositories</SectionTitle>
             <ContentLayout>
                 <RepositoriesTable data={repositories.nodes}/>
             </ContentLayout>
-        </Layout>
+        </AppLayout>
     )
 }
 

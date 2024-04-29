@@ -1,9 +1,4 @@
-<p style="color: green"><%= notice %></p>
-
-<p>Signed in as <%= Current.email %></p>
-
-<h2>Login and verification</h2>
+<!--<p style="color: green; min-height: 100px"><%#= notice %></p>-->
+<p style="color: green; min-height: 21px;"><%= notice %></p>
 
 <%= react_component("HomeIndexPage", @data) %>
-
-<%= button_to "Log out", sessions_path, method: :delete %>

@@ -60,3 +60,4 @@ $ bin/rails s -p 3001 # Ensure you have your .env values filled
 - pre-commit tasks including linting etc.
 - Auto validate GitHub queries / mutations against latest GraphQL schemas via CLI
 - Use theme for styles
+- Fix the styling on the User Details layout
