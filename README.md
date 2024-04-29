@@ -55,3 +55,8 @@ $ bin/rails s -p 3001 # Ensure you have your .env values filled
 - Integrate with nextjs
 - Fix findDOMNode is deprecated issue
 - Remove hardcoded text and use i18n instead
+- Figure out why I wasn't able to simulate submitting the Rails "Sign in with GitHub" form via the AntD form / fetch post
+- Configure TSLint and make use of prettier plugins
+- pre-commit tasks including linting etc.
+- Auto validate GitHub queries / mutations against latest GraphQL schemas via CLI
+- Use theme for styles

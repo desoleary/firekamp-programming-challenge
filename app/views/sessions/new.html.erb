@@ -1,8 +1,6 @@
-<p style="color: green"><%= notice %></p>
-<p style="color: red"><%= alert %></p>
-
-<h1>Sign in</h1>
-
 <div>
-  <%= button_to "Sign in with GitHub", "/auth/github", "data-turbo" => false %>
+  <%= button_to "Sign in with GitHub", "/auth/github", id: "rails-github-sign-in-button", style: "display: none;", "data-turbo" => false %>
 </div>
+
+<%= react_component("LoginPage", @data) %>
+
