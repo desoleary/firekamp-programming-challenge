@@ -4,7 +4,7 @@ import {LogoutOutlined} from "@ant-design/icons";
 import useCsrfToken from '../hooks/useCsrfToken';
 
 
-const { Content, Footer } = Layout;
+const {Content, Footer} = Layout;
 
 const LogoutButton = () => {
     const csrfToken: string = useCsrfToken();
@@ -45,7 +45,8 @@ const LogoutButton = () => {
 
 
     return (
-        <Button type="primary" loading={loading} onClick={handleSubmit} icon={<LogoutOutlined style={{float: 'left'}} />}>
+        <Button type="primary" loading={loading} onClick={handleSubmit}
+                icon={<LogoutOutlined style={{float: 'left'}}/>}>
             Logout
         </Button>
     );
@@ -54,27 +55,26 @@ const LogoutButton = () => {
 
 const AppLayout: React.FC = ({children}: { children?: ReactNode }) => {
     const {
-        token: { colorBgContainer, borderRadiusLG },
+        token: {colorBgContainer, borderRadiusLG},
     } = theme.useToken();
 
     return (
         <Layout>
-            <Content style={{ padding: '0 48px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '16px 0' }}>
-                    {/*TODO: Have breadcrumbs be passed by the caller*/}
-                    <Breadcrumb style={{ margin: '16px 0' }}>
-                        <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
-                        <Breadcrumb.Item>Owner</Breadcrumb.Item>
-                    </Breadcrumb>
+            <Content style={{padding: '0 48px'}}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '16px 0'}}>
+                    <Breadcrumb items={[
+                        {title: 'Dashboard', href: '/'},
+                        {title: 'Owner'}
+                    ]}/>
                     <LogoutButton/>
                 </div>
                 <Layout
-                    style={{ padding: '24px', background: colorBgContainer, borderRadius: borderRadiusLG }}
+                    style={{padding: '24px', background: colorBgContainer, borderRadius: borderRadiusLG}}
                 >
-                    <Content style={{ background: colorBgContainer, minHeight: 280 }}>{children}</Content>
+                    <Content style={{background: colorBgContainer, minHeight: 280}}>{children}</Content>
                 </Layout>
             </Content>
-            <Footer style={{ textAlign: 'center' }}>
+            <Footer style={{textAlign: 'center'}}>
                 Ant Design ©{new Date().getFullYear()} Created by Ant UED
             </Footer>
         </Layout>
