@@ -75,7 +75,7 @@ const AppLayout: React.FC = ({children}: { children?: ReactNode }) => {
                 </Layout>
             </Content>
             <Footer style={{textAlign: 'center'}}>
-                Ant Design ©{new Date().getFullYear()} Created by Ant UED
+                Copyright {new Date().getFullYear()} © Firekamp
             </Footer>
         </Layout>
     );

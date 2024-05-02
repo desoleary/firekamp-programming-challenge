@@ -26,7 +26,7 @@ const LoginPageFooter = () => {
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <img src="/firekamp-footer-logo.svg" alt="FireKamp Logo"
                      style={{fontSize: '20px', marginRight: '8px'}}/>
-                <span style={{color: 'white'}}>Copyright 2023 © Firekamp</span>
+                <span style={{color: 'white'}}>Copyright {new Date().getFullYear()} © Firekamp</span>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
                 <span style={{color: 'white', marginRight: '8px'}}>Private Policy | Terms of Service |</span>
