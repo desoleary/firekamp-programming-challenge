@@ -1,6 +1,66 @@
-import React, {ReactNode, useState} from "react"
-import {Button, Col, Descriptions, Divider, Form, Input, Layout, Row, Table, TableProps, Typography} from 'antd';
+import React, {ReactNode, useRef, useState} from "react"
+import {Button, Descriptions, Divider, Form, Layout, Table, TableProps, Typography} from 'antd';
 import AppLayout from "./AppLayout";
+import RjsfForm from '@rjsf/antd';
+import validator from '@rjsf/validator-ajv8';
+import styled from "styled-components";
+
+const formConfig = {
+    schema: {
+        "type": "object",
+        "required": [
+            "description"
+        ],
+        "properties": {
+            "name": {
+                "type": "string",
+                "title": "Name"
+            },
+            "description": {
+                "type": "string",
+                "title": "Description"
+            },
+            "diskUsage": {
+                "type": "number",
+                "title": "Disk Usage"
+            },
+            "createdAt": {
+                "type": "string",
+                "title": "Created At"
+            },
+            "updatedAt": {
+                "type": "string",
+                "title": "Updated At"
+            }
+        }
+    },
+    uiSchema: {
+        "name": {
+            'ui:options': {
+                disabled: true
+            }
+        },
+        "description": {
+            "ui:widget": "textarea"
+        },
+        "diskUsage": {
+            'ui:options': {
+                disabled: true
+            }
+        }, "createdAt": {
+            'ui:options': {
+                disabled: true
+            }
+        }, "updatedAt": {
+            'ui:options': {
+                disabled: true
+            }
+        },
+    },
+    formContext: {
+        colSpan: 12
+    }
+};
 
 const {Title} = Typography
 
@@ -64,6 +124,17 @@ const columns: TableProps<RepositoryType>['columns'] = [
     }
 ]
 
+const StyledFormWrapper = styled.section`
+  fieldset {
+    border: none;
+  }
+
+  #firekamp-github-repo-submit-btn {
+    width: 85px;
+  }
+`;
+
+
 function addKeyToRepositories(repoList: RepositoryType[]): ({ key: string } & RepositoryType)[] {
     return repoList.map(repo => ({
         key: repo.id,
@@ -94,121 +165,63 @@ const RepositoriesTable = ({data}: { data: RepositoryType[] }) => {
     };
 
     const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
-    const [form] = Form.useForm();
 
 
     const handleExpand = (expanded: boolean, record: RepositoryType) => {
         setExpandedRowKeys(expanded ? [record.id] : []);
     };
 
+    const [isUpdating, setIsUpdating] = useState(false);
+    const formDataMapRef = useRef({});
+
     // Helper function to humanize field names
-    const camelCaseToHumanized = (str: string) => {
-        // Split camelCase string into separate words
-        const words = str.replace(/([a-z])([A-Z])/g, '$1 $2').split(' ');
-        // Capitalize the first letter of each word
-        return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    };
 
+    const withExpandedRowRender = () => (record: RepositoryType) => {
+        // in order to keep number of hooks rendered consistent we need to make use of useRef in the parent component
+        const currentFormData = formDataMapRef.current[record.id] = formDataMapRef.current[record.id] ?? record
 
-    const generateFormItems = (record: RepositoryType, fields: string[], editableFields: string[]) => {
-        return fields
-            .map((field) => {
-                const formItemProps = {
-                    key: field,
-                    name: field,
-                    label: camelCaseToHumanized(field),
-                    initialValue: record[field]
-                }
-                return (
-                    <Form.Item {...formItemProps}>
-                        <Input disabled={!editableFields.includes(field)}/>
-                    </Form.Item>
-                );
-            });
-    };
-
-    const IncludeExcludeHiddenId: React.FC<{ record: RepositoryType, includeHiddenIdField: boolean }> = ({
-                                                                                                             record,
-                                                                                                             includeHiddenIdField
-                                                                                                         }) => {
-        if (!includeHiddenIdField) {
-            return null; // If includeHiddenIdField is false, don't render anything
-        }
+        const handleSave = ({formData}) => {
+            formDataMapRef.current[record.id] =  {...currentFormData, ...formData}
+            setIsUpdating(true)
+            fetch('/github/repositories/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken,
+                },
+                body: JSON.stringify({repository: formData}),
+            })
+                .then(response => {
+                    setIsUpdating(false)
+                    if (!response.ok) {
+                        throw new Error('Failed to update repository');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Repository updated successfully:', data);
+                })
+                .catch(error => {
+                    console.error('Failed to update repository:', error);
+                });
+        };
 
         return (
-            <Form.Item name="id" style={{display: 'none'}} initialValue={record.id}>
-                <Input type="hidden"/>
-            </Form.Item>
-        );
-    };
-    const withExpandedRowRender = ({
-                                       editableFields = [], excludedFields = [], includeHiddenIdField = false
-                                   }: {
-        editableFields: string[],
-        excludedFields: string[],
-        includeHiddenIdField: boolean
-    }) => (record: RepositoryType) => {
-        const fields = Object.keys(record)
-            .filter(field => !excludedFields.includes(field));
-        const halfLength = Math.ceil(fields.length / 2);
-        const leftFields = fields.slice(0, halfLength);
-        const rightFields = fields.slice(halfLength);
-
-        return (
-            <Form form={form} onFinish={handleSave} {...formLayout}>
-                <IncludeExcludeHiddenId record={record} includeHiddenIdField={includeHiddenIdField}/>
-                <Row gutter={24}>
-                    <Col span={12}>{generateFormItems(record, leftFields, editableFields)}</Col>
-                    <Col span={12}>{generateFormItems(record, rightFields, editableFields)}</Col>
-                </Row>
+            <StyledFormWrapper><RjsfForm schema={formConfig.schema} uiSchema={formConfig.uiSchema}
+                                         formData={currentFormData}
+                                         formContext={formConfig.formContext} validator={validator}
+                                         onSubmit={handleSave}>
                 <Form.Item wrapperCol={{span: 2, offset: 22}}>
-                    <Button type="primary" htmlType="submit" style={{marginLeft: -3}}>
+                    <Button id="firekamp-github-repo-submit-btn" type="primary" htmlType="submit"
+                            style={{marginLeft: -3}} loading={isUpdating}>
                         Save
                     </Button>
                 </Form.Item>
-            </Form>
+            </RjsfForm></StyledFormWrapper>
         );
     }
 
-    const handleSave = () => {
-        form
-            .validateFields()
-            .then((values) => {
-                // Handle form submission, e.g., update repository data
-                console.log('Form values:', values);
-
-                // Send the form data to the server
-                fetch('/github/repositories/update', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-Token': csrfToken,
-                    },
-                    body: JSON.stringify({repository: values}),
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Failed to update repository');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Repository updated successfully:', data);
-                    })
-                    .catch(error => {
-                        console.error('Failed to update repository:', error);
-                    });
-            })
-            .catch((error) => {
-                console.error('Validation failed:', error);
-            });
-    };
-
-    const expandedRowRender = withExpandedRowRender({
-        editableFields: ['description'],
-        excludedFields: ['id', 'key'],
-        includeHiddenIdField: true
-    })
+    const expandedRowRender = withExpandedRowRender()
 
 
     return <Table
@@ -218,7 +231,9 @@ const RepositoriesTable = ({data}: { data: RepositoryType[] }) => {
     />
 }
 
-const SectionTitle = ({children}: { children?: ReactNode }) => <div style={{marginTop: 12}}><Divider/><TitlePanel>{children}</TitlePanel><Divider/></div>
+const SectionTitle = ({children}: { children?: ReactNode }) => <div style={{marginTop: 12}}>
+    <Divider/><TitlePanel>{children}</TitlePanel><Divider/></div>
+
 
 const HomeIndexPage = (data: UserInfoType) => {
     const {repositories, ...userInfo} = data
