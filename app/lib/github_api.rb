@@ -9,14 +9,16 @@ class GithubApi
     @connection = Http::Connection.new(ENDPOINT, bearer_token: bearer_token)
   end
 
-  def current_user_info
+  def current_user_info(repositories_filter: '')
     response_body = execute_query(:GetCurrentUserInfo)
-    response_body.dig(:data, :viewer)
+    user_info = response_body.dig(:data, :viewer)
+    repositories = repositories_by_name(repositories_filter)
+    user_info.merge(repositories: repositories)
   end
 
-  def repositories
-    response_body = execute_query(:ListRepositories)
-    response_body.dig(:data, :viewer, :repositories, :nodes)
+  def repositories_by_name(name = '')
+    response_body = execute_query(:RepositoriesSearchByName, schemaParams: [@owner, name])
+    response_body.dig(:data, :search, :edges).pluck(:node)
   end
 
   def repository_by_name(name)
@@ -32,9 +34,10 @@ class GithubApi
 
   private
 
-  def execute_query(identifier, variables = {})
+  def execute_query(identifier, variables = {}, schemaParams: [])
     identifier = identifier.to_sym if identifier.is_a?(String)
     query = queries[identifier]
+    query = query.call(*schemaParams) if query.is_a?(Proc)
 
     raise ArgumentError "no query matching identifier '#{identifier}'. Must be one of #{queries.keys}" if query.blank?
 
@@ -64,17 +67,6 @@ class GithubApi
             projectsUrl
             url
             websiteUrl
-            repositories(first: 20, orderBy: {field: CREATED_AT, direction: DESC}) {
-              nodes {
-                id
-                name
-                description
-                homepageUrl
-                diskUsage
-                createdAt
-                updatedAt
-              }
-            }
           }
         }
       GRAPHQL
@@ -95,21 +87,32 @@ class GithubApi
           }
         }
       GRAPHQL
-      ListRepositories: <<~GRAPHQL,
-      query {
-        viewer {
-          repositories(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) {
-            nodes {
-              id
-              name
-              description
-              createdAt
-              updatedAt
+      RepositoriesSearchByName: lambda do |owner, search|
+        <<~GRAPHQL
+        query {
+          search(query: "owner:#{owner} sort:updated-desc #{search}", type: REPOSITORY, first: 20) {
+            repositoryCount
+            edges {
+              node {
+                ... on Repository {
+                  id
+                  name
+                  description
+                  createdAt
+                  updatedAt
+                  primaryLanguage {
+                    name
+                  }
+                  stargazerCount
+                  forkCount
+                  url
+                }
+              }
             }
           }
         }
-      }
-    GRAPHQL
+      GRAPHQL
+      end
     }
   end
 

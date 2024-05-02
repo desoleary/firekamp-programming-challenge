@@ -1,9 +1,10 @@
 import React, {ReactNode, useRef, useState} from "react"
-import {Button, Descriptions, Divider, Form, Layout, Table, TableProps, Typography} from 'antd';
+import {Button, Descriptions, Divider, Form, Layout, Table, TableProps, Input, Typography} from 'antd';
 import AppLayout from "./AppLayout";
 import RjsfForm from '@rjsf/antd';
 import validator from '@rjsf/validator-ajv8';
 import styled from "styled-components";
+
 
 const formConfig = {
     schema: {
@@ -79,9 +80,7 @@ interface UserInfoType {
     login: string;
     email: string;
     url: string;
-    repositories: {
-        nodes: RepositoryType[]
-    }
+    repositories: RepositoryType[]
 }
 
 const csrfTokenElement = document.head.querySelector("[name='csrf-token']") as HTMLMetaElement;
@@ -181,7 +180,7 @@ const RepositoriesTable = ({data}: { data: RepositoryType[] }) => {
         const currentFormData = formDataMapRef.current[record.id] = formDataMapRef.current[record.id] ?? record
 
         const handleSave = ({formData}) => {
-            formDataMapRef.current[record.id] =  {...currentFormData, ...formData}
+            formDataMapRef.current[record.id] = {...currentFormData, ...formData}
             setIsUpdating(true)
             fetch('/github/repositories/update', {
                 method: 'POST',
@@ -234,10 +233,42 @@ const RepositoriesTable = ({data}: { data: RepositoryType[] }) => {
 const SectionTitle = ({children}: { children?: ReactNode }) => <div style={{marginTop: 12}}>
     <Divider/><TitlePanel>{children}</TitlePanel><Divider/></div>
 
+const Search = ({initialValue = null, onSearch, loading, style}: {
+    initialValue?: string,
+    onSearch: Function,
+    loading: boolean,
+    style: React.CSSProperties
+}) => {
+    const [value, setValue] = useState(initialValue);
+    const handleChange = ({target: {value}}) => {
+        setValue(value)
+    }
+
+    return <Input.Search style={style}
+                         placeholder="Search by name"
+                         enterButton="Search"
+                         size="large"
+                         loading={loading}
+                         onSearch={onSearch}
+                         onChange={handleChange}
+                         value={value}
+    />
+}
+
 
 const HomeIndexPage = (data: UserInfoType) => {
+    const currentUrl = new URL(window.location.href);
+    const repositoriesFilter = currentUrl.searchParams.get('repositoriesFilter')
     const {repositories, ...userInfo} = data
     const userInfoItems = getUserInfoItems(userInfo)
+
+    const [isSearching, setIsSearching] = useState(false);
+    const handleRepositorySearch = (value: string) => {
+        setIsSearching(true)
+        currentUrl.searchParams.set('repositoriesFilter', value);
+
+        window.location.href = currentUrl.toString();
+    }
 
     return (
         <AppLayout>
@@ -247,7 +278,9 @@ const HomeIndexPage = (data: UserInfoType) => {
             </ContentLayout>
             <SectionTitle>Repositories</SectionTitle>
             <ContentLayout>
-                <RepositoriesTable data={repositories.nodes}/>
+                <Search initialValue={repositoriesFilter} style={{float: 'left', width: '300px', paddingBottom: 12}}
+                        loading={isSearching} onSearch={handleRepositorySearch}/>
+                <RepositoriesTable data={repositories}/>
             </ContentLayout>
         </AppLayout>
     )
